@@ -121,12 +121,20 @@ class YCBMulticamDataset:
 			for topic, msg, t in bag.read_messages(topics=topics):
 				snapshot[cam][topic].append(msg)
 			bag.close()
+
 			# transform ground truth to rgb frame
 			snapshot[cam]["ground_truth"] = []
 			for object in [o for o in self.ground_truths[scene] if o["cls"] not in self.exclude_objects]:
 				if (self.tfBuffer.can_transform(snapshot[cam]["rgb_img"][0].header.frame_id, "aruco_ref", rospy.Time(0))):
 					snapshot[cam]["ground_truth"].append({"cls": object["cls"], "pose": self.tfBuffer.transform(object["pose"], snapshot[cam]["rgb_img"][0].header.frame_id)})
 				else:
-					print("Cannot transform object to ground truth, skipping this frame")
-					return
+					print("Cannot transform {} directly to reference frame, trying from other cameras").format(cam)
+					for alternative_cam in self.cams:
+						tmpPose = object["pose"]
+						tmpPose.header.frame_id = alternative_cam + "/aruco_node/aruco_ref"
+						if (self.tfBuffer.can_transform(snapshot[cam]["rgb_img"][0].header.frame_id, tmpPose.header.frame_id, rospy.Time(0))):
+							snapshot[cam]["ground_truth"].append({"cls": object["cls"], "pose": self.tfBuffer.transform(object["pose"], snapshot[cam]["rgb_img"][0].header.frame_id)})
+							print("Found transform via {}").format(alternative_cam)
+							break
+						print("Could not find any way to transform ground truth. This frame will not be usable for all cameras")
 		return snapshot
