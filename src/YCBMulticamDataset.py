@@ -71,7 +71,7 @@ class YCBMulticamDataset:
 
 
 
-	def get_data(self, cam, source=DataSource.ALL, cloud=False):
+	def get_data(self, cam, source=DataSource.ALL, scenes=None, cloud=False):
 		""" returns a generator over a recording for a given scene and camera
 
 		:param source: The data source from which the frames are taken. That can be either the Snapshots, the Recordings or both
@@ -98,17 +98,21 @@ class YCBMulticamDataset:
 
 			the whole blob will be several GB big if cloud is enabled
 		"""
-
-
+		if scenes != None:
+			use_scenes = scenes
+		else:
+			use_scenes = self.scenes
+		print(use_scenes)
 		if source == DataSource.RECORDING or source == DataSource.ALL :
-			for scene in self.scenes:
+			for scene in use_scenes:
 				try:
 					for frame in self.__get_recording_frames(scene, cam, cloud):
 						yield frame
 				except(FaultyDataException):
 					print("Ignoring faulty data in scene: {}, with cam: {}. Continuing with next scene.", scene, cam)
 		if source == DataSource.SNAPSHOT or source == DataSource.ALL:
-			for scene in self.scenes:
+			print("snap")
+			for scene in use_scenes:
 				for pos in self.positions:
 					try:
 						for frame in self.__get_snapshot(scene, pos, cam, cloud):
@@ -152,13 +156,27 @@ class YCBMulticamDataset:
 		bag_path = self.path + "/scenes/" + scene + "/recordings/"+ cam + ".bag"
 
 		tf_bag = rosbag.Bag(bag_path)
-		for topic, msg, t in tf_bag.read_messages(topics={"/tf", "/tf_static"}):
-			if topic == "/tf":
-				for tf in msg.transforms:
-					self.__tfBuffer.set_transform(tf, "")
-			if topic == "/tf_static":
-				for tf in msg.transforms:
-					self.__tfBuffer.set_transform_static(tf, "")
+		try:
+			for topic, msg, t in tf_bag.read_messages(topics={"/tf"}):
+				if topic == "/tf":
+					for tf in msg.transforms:
+						self.__tfBuffer.set_transform(tf, "")
+		except (genpy.DeserializationError):
+			raise FaultyDataException
+
+		try:
+			for topic, msg, t in tf_bag.read_messages(topics={"/tf_static"}):
+				if topic == "/tf_static":
+					for tf in msg.transforms:
+						self.__tfBuffer.set_transform_static(tf, "")
+		except (genpy.DeserializationError): # some recordings have faulty data in tf_static.. the static tfs dont change between scenes so we can use the tfs of another scene
+			tf_bag.close()
+			tf_bag = rosbag.Bag(self.path + "/scenes/003_007_009_010/recordings/"+ cam + ".bag")
+			for topic, msg, t in tf_bag.read_messages(topics={"/tf_static"}):
+				if topic == "/tf_static":
+					for tf in msg.transforms:
+						self.__tfBuffer.set_transform_static(tf, "")
+
 		tf_bag.close()
 
 		topics = ['depth_img', 'rgb_img', 'depth_info', 'rgb_info']
@@ -311,7 +329,6 @@ class YCBMulticamDataset:
 		flags["camera"] = cam
 
 		flags["source"] = "SNAPSHOT" if source == DataSource.SNAPSHOT else "RECORDING"
-		print(flags["source"])
 		flags["scene_name"] = scene
 
 		if position != None:

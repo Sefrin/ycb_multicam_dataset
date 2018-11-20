@@ -2,6 +2,7 @@
 import rospy
 import os.path
 import yaml
+from yaml import CLoader as Loader, CDumper as Dumper
 import numpy as np
 from YCBMulticamDataset import YCBMulticamDataset as ycb
 from YCBMulticamDataset import DataSource
@@ -12,12 +13,22 @@ from pyquaternion import Quaternion
 from cv_bridge import CvBridge, CvBridgeError
 import pypcd
 data_path = "/home/dfki.uni-bremen.de/tgrenzdoerffer/storage/compare_data"
+import errno
+
 
 def eval_posecnn():
+	rospy.sleep(10.)
 	data = ycb(data_path)
-	idx = 0
-	for cam in data.cams:
-		for frame in data.get_data(cam, DataSource.SNAPSHOT):
+	idx = 8816
+
+	for cam in ["basler_tof", "ensenso", "kinect2", "pico_flexx", "realsense_r200", "xtion"]:
+		print("Evaluating {}".format(cam))
+		for frame in data.get_data(cam, DataSource.ALL):
+			# print(frame["metadata"]["scene_name"])
+			print(idx)
+			if idx < 14446:
+				idx+=1
+				continue
 			rospy.wait_for_service('/posecnn_client/pose_cnn_refined')
 			try:
 				req = rospy.ServiceProxy('/posecnn_client/pose_cnn_refined', pose_cnn_refined)
@@ -29,9 +40,9 @@ def eval_posecnn():
 					gt.append({"cls" : entry["cls"], "pose" : make_pose(entry["pose"].pose.position, entry["pose"].pose.orientation)})
 				result = eval_result(data, detections, gt, frame["depth_img"], frame["depth_info"])
 				#save the intermediate results...
-				save_detection(result, detections, gt, frame["metadata"], idx)
+				save_detection(result, detections, gt, frame["metadata"], idx, cam)
 			except rospy.ServiceException, e:
-				print "Service call failed: %s"%e
+				print("Service call failed: %s"%e)
 			idx += 1
 
 def eval_result(data, detection, ground_truth, depth_img, depth_info):
@@ -45,22 +56,26 @@ def eval_result(data, detection, ground_truth, depth_img, depth_info):
 		vsd_error = None
 		trans_error = None
 		rot_error = None
+		trans_error_2d = None
+
 		if obj_cls not in gt_classes:
 			correctness = None
 		else:
 			if obj_cls in gt_classes and obj_cls in detection_classes:
 				gt_entry = [det for det in ground_truth if det["cls"] == obj_cls][0]
 				detection_entry = [det for det in detection if det["cls"] == obj_cls][0]
+				# check the pose errorrrrr
+				gt_2d_pos = [gt_entry["pose"]["position"][0], gt_entry["pose"]["position"][1]]
+				detection_2d_pos = [detection_entry["pose"]["position"][0], detection_entry["pose"]["position"][1]]
+				trans_error_2d = distance.euclidean(gt_2d_pos, detection_2d_pos)
+				trans_error, rot_error, vsd_error = get_errors(obj_cls, detection_entry["pose"], gt_entry["pose"], depth_img, depth_info)
 				# check range with tolerance: if object centers are within 5 cm, the recognition is considered correct
-				pos_error = distance.euclidean(gt_entry["pose"]["position"], detection_entry["pose"]["position"])
-				if pos_error <= 0.05:
+				if trans_error_2d <= 0.05:
 					correctness = "correct"
-					# if it is correctly detected, check the pose errorrrrr
-					trans_error, rot_error, vsd_error = get_errors(obj_cls, detection_entry["pose"], gt_entry["pose"], depth_img, depth_info)
-					print("CORRECT DETECTION! With euclidean distance: {} or {}, rot error: {} and vsd error: {}".format(pos_error, trans_error, rot_error, vsd_error))
+					print("CORRECT DETECTION! With euclidean distance: {}, rot error: {} and vsd error: {}".format(trans_error_2d, rot_error, vsd_error))
 				else:
-					correctness = "false_pos"
-					print("Wrong pos :(")
+					correctness = "in_scene"
+					print("Wrong pos :( distance: {}".format(trans_error))
 			if obj_cls in gt_classes and obj_cls not in detection_classes:
 				correctness = "false_neg"
 			if obj_cls not in gt_classes and obj_cls in detection_classes:
@@ -69,6 +84,7 @@ def eval_result(data, detection, ground_truth, depth_img, depth_info):
 		result[obj_cls+"_correctness"] = correctness # or "correct", "false_pos", "false_neg"
 		result[obj_cls+"_vsd_error"] = vsd_error
 		result[obj_cls+"_trans_error"] = trans_error
+		result[obj_cls+"_2d_trans_error"] = trans_error_2d
 		result[obj_cls+"_rot_error"] = rot_error
 	return result
 
@@ -116,7 +132,7 @@ def vision_msgs2detection(data, vision_msg):
 		detections.append({"cls" : object_class, "pose" : pose})
 	return detections
 
-def save_detection(result, detection, ground_truth, metadata, idx):
+def save_detection(result, detection, ground_truth, metadata, idx, cam):
 	data_points = []
 	data_point = {}
 	data_point["frame_idx"] = idx
@@ -133,20 +149,25 @@ def save_detection(result, detection, ground_truth, metadata, idx):
 
 
 
-	yaml_path = data_path + '/results_' + metadata["source"] + '.yaml'
+	yaml_path = data_path + '/results_ALL_noICP/' + cam + '/'+ str(idx) +'.yaml'
 	if not os.path.isfile(yaml_path):
+		try:
+			os.makedirs(os.path.dirname(yaml_path))
+		except OSError as exc: # Guard against race condition
+			if exc.errno != errno.EEXIST:
+				raise
 		with open(yaml_path,'w') as yamlfile:
-			yaml.safe_dump(data_points, yamlfile)
+			yaml.dump(data_points, yamlfile, Dumper = Dumper)
 			return
 
-	with open(yaml_path,'r') as yamlfile:
-		cur_yaml = yaml.safe_load(yamlfile) # Note the safe_load
+	# with open(yaml_path,'r') as yamlfile:
+	# 	cur_yaml = yaml.load(yamlfile, Loader=Loader) # Note the safe_load
 
-	cur_yaml.append(data_point)
+	# cur_yaml.append(data_point)
 
-	if cur_yaml:
-		with open(yaml_path,'w') as yamlfile:
-			yaml.safe_dump(cur_yaml, yamlfile) # Also note the safe_dump
+	# if cur_yaml:
+	# 	with open(yaml_path,'w') as yamlfile:
+	# 		yaml.dump(cur_yaml, yamlfile, Dumper = Dumper) # Also note the safe_dump
 
 
 
