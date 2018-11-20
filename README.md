@@ -1,4 +1,4 @@
-Introduction
+The YCB-Multicam-Dataset
 ============
 
 Since computer vision is an important aspect in the field of robotics,
@@ -7,7 +7,7 @@ evaluate the suitability of these sensors, there exists the need for
 datasets that include multiple sensors in a comparable fashion. This
 dataset was conceived in order to satisfy that need and provide a basis
 for a quantitative comparison of 3D sensors with regard to object
-recognition.\
+recognition.
 The dataset provides 32 scenes containing a selection of 20 objects from
 the YCB Object and Model set @ycb_dataset and is designed to compare
 6DOF pose estimation of object recognition algorithms applied to the
@@ -32,25 +32,25 @@ background and marker board visible in every scene), the resulting
 trained model will most likely yield suboptimal results in data other
 than what is provided.
 
-Sensors {#sensors .unnumbered}
+Sensors
 =======
 
 We included the following 3D-sensors into the dataset. Sensors that do
 not yield RGB images are marked with an asterisk.
 
-\[t\]<span>0.33</span> **Structured Light**\
+**Structured Light**
 
 -   ASUS Xtion Pro Live
 
 -   Orbbec Astra
 
-\[t\]<span>0.33</span> **Active Stereo**\
+**Active Stereo**
 
 -   Ensenso N35
 
 -   Intel RealSense R200
 
-\[t\]<span>0.33</span> **Time of Flight**\
+**Time of Flight**
 
 -   Microsoft Kinect2
 
@@ -58,7 +58,7 @@ not yield RGB images are marked with an asterisk.
 
 -   Basler ToF Engineering Sample\*
 
-Structure of the dataset {#structure-of-the-dataset .unnumbered}
+Structure of the dataset
 ========================
 
 The dataset was recorded using ROS @ROS and hence is stored in the
@@ -81,110 +81,67 @@ In total there are 8064 annotated frames from the snapshots and about
 provide the transforms between the camera frames as well as the
 transforms from the camera rig to the marker board reference frame.
 
-The folder structure of the dataset is displayed in fig.
-\[fig:folder\_structure\].
+The folder structure of the dataset:
 
-Provided code for evaluation {#provided-code-for-evaluation .unnumbered}
+<p align="center">
+    <img src="pics/file_structure.png" width="50%" />
+</p>
+
+Provided code for evaluation
 ============================
 
 In this repository we provide an interface for easy access to the
 dataset. It is written in Python 2.7 and uses ROS, which is both needed
 in order to use this code.
 
-The YCBMulticamDataset class contains the following and :
+The YCBMulticamDataset class contains the following fields:
 
-- List of used camera names as strings
+`cams` - List of used camera names as strings
 
-- List of used classes
+`classes` - List of used object classes
 
-returns a Python Generator which iterates over all available frames of a
+... and the following methods:
+
+`get_data(cam[string], source[DataSource], cloud[bool])` - returns a Python Generator which iterates over all available frames of a
 given camera and from a given source (i.e. fixed positions, trajectories
 or both)
 
-1.  : string containing the name of desired camera as in , e.g.: ’astra’
+Parameters:
 
-2.  : a value of the enum which can be either (data from fixed
-    positions), (data from trajectories) or (all available data)
+1. `cam` : string containing the name of desired camera as in , e.g.: ’astra’
 
-3.  a boolean that indicates, whether the point cloud data should be
+2. `source` : a value of the enum `DataSource` which can be either `SNAPSHOT` (data from fixed
+    positions), `RECORDING` (data from trajectories) or `ALL` (all available data)
+
+3. `cloud` a boolean that indicates, whether the point cloud data should be
     retrieved
 
-The generated frames have the format depicted in
-\[fig:frame\_structure\].
+The generated frames have the following format:
+<p align="center">
+    <img src="pics/frame_structure.png" width="50%" />
+</p>
 
-Sample data {#sample-data .unnumbered}
+
+Sample data
 ===========
 
-In the following figures we provide some sample data from the dataset.
-Figure \[fig:cloud\_raster\] contains the depth data captured by all
+In the following figure we provide some sample data from the dataset.
+It contains the depth data captured by all
 used sensors, as well as ground truth annotations on its own and
 rendered into the scene for the pointcloud of the Ensenso N35 camera.
-Figure \[fig:cloud\_color\_raster\] contains the RGB pointclouds from
-the RGBD cameras for the same scene.
 
-<span>ccc</span> ![Pointclouds from the dataset depicting the same scene
-from the same position, as well as the ground truth object arrangement
-and the ground truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/astra_axis "fig:"){width=".33\linewidth"}
-& ![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/basler_tof_axis "fig:"){width=".33\linewidth"}
-& ![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/ensenso_axis "fig:"){width=".33\linewidth"}\
-Orbbec Astra & Basler ToF & Ensenso N35\
-![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/kinect2_axis "fig:"){width=".33\linewidth"}
-& ![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/pico_flexx_axis "fig:"){width=".33\linewidth"}
-& ![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/realsense_r200_axis "fig:"){width=".33\linewidth"}\
-Microsoft Kinect2& PMD CamBoard pico flexx & Intel RealSense R200\
-![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/gt_no_cloud_f_black "fig:"){width=".33\linewidth"}
-& ![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/xtion_axis "fig:"){width=".33\linewidth"}
-& ![Pointclouds from the dataset depicting the same scene from the same
-position, as well as the ground truth object arrangement and the ground
-truth transformed into the Ensenso pointcloud.<span
-data-label="fig:cloud_raster"></span>](pics/raster_clouds/gt_ensenso_f_black "fig:"){width=".33\linewidth"}\
-Ground truth & ASUS Xtion Pro Live & Ground truth in the scene\
-
-<span>ccc</span> ![RGB pointclouds from the dataset depicting the same
-scene from the same position.<span
-data-label="fig:cloud_color_raster"></span>](pics/raster_clouds/astra_f "fig:"){width=".33\linewidth"}
-& ![RGB pointclouds from the dataset depicting the same scene from the
-same position.<span
-data-label="fig:cloud_color_raster"></span>](pics/raster_clouds/xtion_f "fig:"){width=".33\linewidth"}
-& ![RGB pointclouds from the dataset depicting the same scene from the
-same position.<span
-data-label="fig:cloud_color_raster"></span>](pics/raster_clouds/ensenso_f "fig:"){width=".33\linewidth"}\
-Orbbec Astra & ASUS Xtion Pro Live & Ensenso N35\
-![RGB pointclouds from the dataset depicting the same scene from the
-same position.<span
-data-label="fig:cloud_color_raster"></span>](pics/raster_clouds/kinect2_f "fig:"){width=".33\linewidth"}
-& & ![RGB pointclouds from the dataset depicting the same scene from the
-same position.<span
-data-label="fig:cloud_color_raster"></span>](pics/raster_clouds/realsense_r200_f "fig:"){width=".33\linewidth"}\
-Microsoft Kinect2& & Intel RealSense R200\
-
-Figure \[fig:pos\_raster\] depicts the same scene from all fixed
-positions we used, as recorded by the Ensenso N35 camera.
-
-  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos0 "fig:"){width=".33\linewidth"}   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos1 "fig:"){width=".33\linewidth"}   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos2 "fig:"){width=".33\linewidth"}
-   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos5 "fig:"){width=".33\linewidth"}   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos4 "fig:"){width=".33\linewidth"}   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos4 "fig:"){width=".33\linewidth"}
-   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos6 "fig:"){width=".33\linewidth"}   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos7 "fig:"){width=".33\linewidth"}   ![Images of a scene from every fixed position, as recorded by the Ensenso N35<span data-label="fig:pos_raster"></span>](pics/raster_pos/ensenso_pos8 "fig:"){width=".33\linewidth"}
-  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<p align="center">
+  <img src="pics/raster_clouds/astra_axis.png" width="30%" />
+  <img src="pics/raster_clouds/basler_tof_axis.png" width="30%" /> 
+  <img src="pics/raster_clouds/ensenso_axis.png" width="30%" />
+</p>
+<p align="center">
+  <img src="pics/raster_clouds/kinect2_axis.png" width="30%" />
+  <img src="pics/raster_clouds/pico_flexx_axis.png" width="30%" /> 
+  <img src="pics/raster_clouds/realsense_r200_axis.png" width="30%" />
+</p>
+<p align="center">
+  <img src="pics/raster_clouds/gt_no_cloud_f_black.png" width="30%" />
+  <img src="pics/raster_clouds/xtion_axis.png" width="30%" /> 
+  <img src="pics/raster_clouds/gt_ensenso_f_black.png" width="30%" />
+</p>
