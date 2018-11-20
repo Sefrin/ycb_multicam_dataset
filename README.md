@@ -9,12 +9,12 @@ dataset was conceived in order to satisfy that need and provide a basis
 for a quantitative comparison of 3D sensors with regard to object
 recognition.
 The dataset provides 32 scenes containing a selection of 20 objects from
-the YCB Object and Model set @ycb_dataset and is designed to compare
+the [YCB Object and Model set](http://www.ycbbenchmarks.com/) and is designed to compare
 6DOF pose estimation of object recognition algorithms applied to the
 data of different cameras.
 
 The scenes also contain a marker board featuring fiducial markers
-(ArUco-markers @Aruco2014) which provides a reference frame shared among
+([ArUco-markers](https://www.uco.es/investiga/grupos/ava/node/26)) which provides a reference frame shared among
 the cameras and the ground truth annotations. This marker board also
 acts as a calibration means for the inter-camera calibration.
 
@@ -61,7 +61,7 @@ not yield RGB images are marked with an asterisk.
 Structure of the dataset
 ========================
 
-The dataset was recorded using ROS @ROS and hence is stored in the
+The dataset was recorded using [ROS](http://www.ros.org/) and hence is stored in the
 versatile rosbag format. In each rosbag file there are multiple messages
 containing the following data:
 
