@@ -162,56 +162,56 @@ class YCBMulticamDataset:
 				if topic == "/tf":
 					for tf in msg.transforms:
 						self.__tfBuffer.set_transform(tf, "")
-		except (genpy.DeserializationError):
-			raise FaultyDataException
+			try:
+				for topic, msg, t in tf_bag.read_messages(topics={"/tf_static"}):
+					if topic == "/tf_static":
+						for tf in msg.transforms:
+							self.__tfBuffer.set_transform_static(tf, "")
+			except (genpy.DeserializationError): # some recordings have faulty data in tf_static.. the static tfs dont change between scenes so we can use the tfs of another scene
+				tf_bag.close()
+				tf_bag = rosbag.Bag(self.path + "/scenes/003_007_009_010/recordings/"+ cam + ".bag")
+				for topic, msg, t in tf_bag.read_messages(topics={"/tf_static"}):
+					if topic == "/tf_static":
+						for tf in msg.transforms:
+							self.__tfBuffer.set_transform_static(tf, "")
 
-		try:
-			for topic, msg, t in tf_bag.read_messages(topics={"/tf_static"}):
-				if topic == "/tf_static":
-					for tf in msg.transforms:
-						self.__tfBuffer.set_transform_static(tf, "")
-		except (genpy.DeserializationError): # some recordings have faulty data in tf_static.. the static tfs dont change between scenes so we can use the tfs of another scene
 			tf_bag.close()
-			tf_bag = rosbag.Bag(self.path + "/scenes/003_007_009_010/recordings/"+ cam + ".bag")
-			for topic, msg, t in tf_bag.read_messages(topics={"/tf_static"}):
-				if topic == "/tf_static":
-					for tf in msg.transforms:
-						self.__tfBuffer.set_transform_static(tf, "")
 
-		tf_bag.close()
+			topics = ['depth_img', 'rgb_img', 'depth_info', 'rgb_info']
+			if cloud:
+				topics.append('cloud')
 
-		topics = ['depth_img', 'rgb_img', 'depth_info', 'rgb_info']
-		if cloud:
-			topics.append('cloud')
-
-		# write images/caminfo to snapshot
-		#create dicts
-		frames = {}
-		for t in topics:
-			frames[t] = []
-		ground_truth = {}
-		#collect frames in which there was no transform
-		invalid_frames = []
-		index = 0
-		bag = rosbag.Bag(bag_path)
-		for topic, msg, t in bag.read_messages(topics=topics):
-			if topic not in ["/tf", "/tf_static", "/joint_states"]:
-				frames[topic].append(msg)
-			if topic == 'rgb_img':
-				# transform each gt object into rgb image frame
-				ground_truth[index] = []
-				for object in self.__ground_truths[scene]:
-					try:
-						# we know that there is no transform via ensenso
-						tmpPose = object["pose"]
-						tmpPose.header.frame_id = cam + "/aruco_node/aruco_ref"
-						pose_transformed = self.__transform_pose(tmpPose, msg.header.frame_id, msg.header.stamp)
-						ground_truth[index].append({"cls": object["cls"], "pose": pose_transformed})
-					except(NoTransformException):
-						# if we cannot transform it: throw this frame away
-						print("did not find transform")
-						invalid_frames.append(index)
-				index += 1
+			# write images/caminfo to snapshot
+			#create dicts
+			frames = {}
+			for t in topics:
+				frames[t] = []
+			ground_truth = {}
+			#collect frames in which there was no transform
+			invalid_frames = []
+			index = 0
+			bag = rosbag.Bag(bag_path)
+			for topic, msg, t in bag.read_messages(topics=topics):
+				if topic not in ["/tf", "/tf_static", "/joint_states"]:
+					frames[topic].append(msg)
+				if topic == 'rgb_img':
+					# transform each gt object into rgb image frame
+					ground_truth[index] = []
+					for object in self.__ground_truths[scene]:
+						try:
+							# we know that there is no transform via ensenso
+							tmpPose = object["pose"]
+							tmpPose.header.frame_id = cam + "/aruco_node/aruco_ref"
+							pose_transformed = self.__transform_pose(tmpPose, msg.header.frame_id, msg.header.stamp)
+							ground_truth[index].append({"cls": object["cls"], "pose": pose_transformed})
+						except(NoTransformException):
+							# if we cannot transform it: throw this frame away
+							print("did not find transform")
+							invalid_frames.append(index)
+					index += 1
+		except Exception as ex:
+			print(ex)
+			raise FaultyDataException
 		bag.close()
 		#check if data is valid i.e. same amount of frames for all topics
 		frame_count = -1

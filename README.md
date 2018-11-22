@@ -26,11 +26,15 @@ the scene for which each camera moved in a trajectory around the scene.
 Again, the recordings were performed sequentially in order to avoid
 interference.
 
+<img src="pics/setup/videos/20181024_multicam_side_5x.gif" alt="Recording the multicam dataset" style="width:640;height:360px;"> 
+
 Important note: This dataset is not conceived as a training dataset i.e.
 for neuronal networks. Since the data are heavily biased (same
 background and marker board visible in every scene), the resulting
 trained model will most likely yield suboptimal results in data other
 than what is provided.
+
+
 
 Sensors
 =======
@@ -131,17 +135,17 @@ used sensors, as well as ground truth annotations on its own and
 rendered into the scene for the pointcloud of the Ensenso N35 camera.
 
 <p align="center">
-  <img src="pics/raster_clouds/astra_axis.png" width="30%" />
-  <img src="pics/raster_clouds/basler_tof_axis.png" width="30%" /> 
-  <img src="pics/raster_clouds/ensenso_axis.png" width="30%" />
+  <img src="pics/daten/raster_clouds/astra_axis.png" width="30%" />
+  <img src="pics/daten/raster_clouds/basler_tof_axis.png" width="30%" /> 
+  <img src="pics/daten/raster_clouds/ensenso_axis.png" width="30%" />
 </p>
 <p align="center">
-  <img src="pics/raster_clouds/kinect2_axis.png" width="30%" />
-  <img src="pics/raster_clouds/pico_flexx_axis.png" width="30%" /> 
-  <img src="pics/raster_clouds/realsense_r200_axis.png" width="30%" />
+  <img src="pics/daten/raster_clouds/kinect2_axis.png" width="30%" />
+  <img src="pics/daten/raster_clouds/pico_flexx_axis.png" width="30%" /> 
+  <img src="pics/daten/raster_clouds/realsense_r200_axis.png" width="30%" />
 </p>
 <p align="center">
-  <img src="pics/raster_clouds/gt_no_cloud_f_black.png" width="30%" />
-  <img src="pics/raster_clouds/xtion_axis.png" width="30%" /> 
-  <img src="pics/raster_clouds/gt_ensenso_f_black.png" width="30%" />
+  <img src="pics/daten/raster_clouds/gt_no_cloud_f_black.png" width="30%" />
+  <img src="pics/daten/raster_clouds/xtion_axis.png" width="30%" /> 
+  <img src="pics/daten/raster_clouds/gt_ensenso_f_black.png" width="30%" />
 </p>

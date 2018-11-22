@@ -6,7 +6,7 @@ from yaml import CLoader as Loader, CDumper as Dumper
 import numpy as np
 from YCBMulticamDataset import YCBMulticamDataset as ycb
 from YCBMulticamDataset import DataSource
-from pose_cnn.srv import posecnn_refined
+from pose_cnn.srv import posecnn_recognize_refined
 from obj_pose_eval import pose_error, inout
 from scipy.spatial import distance
 from pyquaternion import Quaternion
@@ -29,9 +29,9 @@ def eval_posecnn():
 			if idx < 24222:
 				idx+=1
 				continue
-			rospy.wait_for_service('/posecnn_client/posecnn_refined')
+			rospy.wait_for_service('/posecnn_refined/posecnn_recognize_refined')
 			try:
-				req = rospy.ServiceProxy('/posecnn_client/posecnn_refined', pose_cnn_refined)
+				req = rospy.ServiceProxy('/posecnn_refined/posecnn_recognize_refined', posecnn_recognize_refined)
 				resp1 = req(frame["rgb_img"], frame["depth_img"], frame["rgb_info"])
 				detections = vision_msgs2detection(data, resp1.detections)
 				# pose needs to be converted into a more convenient format
