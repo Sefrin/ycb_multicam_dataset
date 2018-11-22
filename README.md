@@ -91,7 +91,7 @@ transforms from the camera rig to the marker board reference frame.
 The folder structure of the dataset:
 
 <p align="center">
-    <img src="pics/file_structure.png" width="50%" />
+    <img src="pics/figures/file_structure.png" width="50%" />
 </p>
 
 Provided code for evaluation
@@ -125,7 +125,7 @@ Parameters:
 
 The generated frames have the following format:
 <p align="center">
-    <img src="pics/frame_structure.png" width="50%" />
+    <img src="pics/figures/frame_structure.png" width="50%" />
 </p>
 
 
@@ -138,17 +138,17 @@ used sensors, as well as ground truth annotations on its own and
 rendered into the scene for the pointcloud of the Ensenso N35 camera.
 
 <p align="center">
-  <img src="pics/daten/raster_clouds/astra_axis.png" width="30%" />
-  <img src="pics/daten/raster_clouds/basler_tof_axis.png" width="30%" /> 
-  <img src="pics/daten/raster_clouds/ensenso_axis.png" width="30%" />
+  <img src="pics/sample_data/raster_clouds/astra_axis.png" width="30%" />
+  <img src="pics/sample_data/raster_clouds/basler_tof_axis.png" width="30%" /> 
+  <img src="pics/sample_data/raster_clouds/ensenso_axis.png" width="30%" />
 </p>
 <p align="center">
-  <img src="pics/daten/raster_clouds/kinect2_axis.png" width="30%" />
-  <img src="pics/daten/raster_clouds/pico_flexx_axis.png" width="30%" /> 
-  <img src="pics/daten/raster_clouds/realsense_r200_axis.png" width="30%" />
+  <img src="pics/sample_data/raster_clouds/kinect2_axis.png" width="30%" />
+  <img src="pics/sample_data/raster_clouds/pico_flexx_axis.png" width="30%" /> 
+  <img src="pics/sample_data/raster_clouds/realsense_r200_axis.png" width="30%" />
 </p>
 <p align="center">
-  <img src="pics/daten/raster_clouds/gt_no_cloud_f_black.png" width="30%" />
-  <img src="pics/daten/raster_clouds/xtion_axis.png" width="30%" /> 
-  <img src="pics/daten/raster_clouds/gt_ensenso_f_black.png" width="30%" />
+  <img src="pics/sample_data/raster_clouds/gt_no_cloud_f_black.png" width="30%" />
+  <img src="pics/sample_data/raster_clouds/xtion_axis.png" width="30%" /> 
+  <img src="pics/sample_data/raster_clouds/gt_ensenso_f_black.png" width="30%" />
 </p>
