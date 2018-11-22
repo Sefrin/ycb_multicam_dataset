@@ -26,7 +26,10 @@ the scene for which each camera moved in a trajectory around the scene.
 Again, the recordings were performed sequentially in order to avoid
 interference.
 
-<img src="pics/setup/videos/20181024_multicam_side_5x.gif" alt="Recording the multicam dataset" style="width:640;height:360px;"> 
+<p align="center">
+  <img src="pics/setup/videos/20181024_multicam_side_5x.gif" alt="Recording the multicam dataset" width="50%"> 
+</p>
+
 
 Important note: This dataset is not conceived as a training dataset i.e.
 for neuronal networks. Since the data are heavily biased (same
