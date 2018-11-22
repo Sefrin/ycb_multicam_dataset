@@ -6,7 +6,7 @@ from yaml import CLoader as Loader, CDumper as Dumper
 import numpy as np
 from YCBMulticamDataset import YCBMulticamDataset as ycb
 from YCBMulticamDataset import DataSource
-from compare_cams.srv import pose_cnn_refined
+from pose_cnn.srv import posecnn_refined
 from obj_pose_eval import pose_error, inout
 from scipy.spatial import distance
 from pyquaternion import Quaternion
@@ -19,19 +19,19 @@ import errno
 def eval_posecnn():
 	rospy.sleep(10.)
 	data = ycb(data_path)
-	idx = 8816
+	idx = 23462
 
-	for cam in ["basler_tof", "ensenso", "kinect2", "pico_flexx", "realsense_r200", "xtion"]:
+	for cam in ["kinect2", "pico_flexx", "realsense_r200", "xtion"]:
 		print("Evaluating {}".format(cam))
 		for frame in data.get_data(cam, DataSource.ALL):
-			# print(frame["metadata"]["scene_name"])
-			print(idx)
-			if idx < 14446:
+			print(frame["metadata"]["scene_name"])
+			# print(idx)
+			if idx < 24222:
 				idx+=1
 				continue
-			rospy.wait_for_service('/posecnn_client/pose_cnn_refined')
+			rospy.wait_for_service('/posecnn_client/posecnn_refined')
 			try:
-				req = rospy.ServiceProxy('/posecnn_client/pose_cnn_refined', pose_cnn_refined)
+				req = rospy.ServiceProxy('/posecnn_client/posecnn_refined', pose_cnn_refined)
 				resp1 = req(frame["rgb_img"], frame["depth_img"], frame["rgb_info"])
 				detections = vision_msgs2detection(data, resp1.detections)
 				# pose needs to be converted into a more convenient format

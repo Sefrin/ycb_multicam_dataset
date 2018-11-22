@@ -105,14 +105,15 @@ class YCBMulticamDataset:
 		print(use_scenes)
 		if source == DataSource.RECORDING or source == DataSource.ALL :
 			for scene in use_scenes:
+				print(scene)
 				try:
 					for frame in self.__get_recording_frames(scene, cam, cloud):
 						yield frame
 				except(FaultyDataException):
 					print("Ignoring faulty data in scene: {}, with cam: {}. Continuing with next scene.", scene, cam)
 		if source == DataSource.SNAPSHOT or source == DataSource.ALL:
-			print("snap")
 			for scene in use_scenes:
+				print("scene")
 				for pos in self.positions:
 					try:
 						for frame in self.__get_snapshot(scene, pos, cam, cloud):

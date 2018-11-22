@@ -8,7 +8,7 @@ project(ycb_multicam_dataset)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  compare_cams
+  pose_cnn
   roscpp
   rospy
   vision_msgs
