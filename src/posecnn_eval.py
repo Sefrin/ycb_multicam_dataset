@@ -19,16 +19,11 @@ import errno
 def eval_posecnn():
 	rospy.sleep(10.)
 	data = ycb(data_path)
-	idx = 23462
+	idx = 0
 
-	for cam in ["kinect2", "pico_flexx", "realsense_r200", "xtion"]:
+	for cam in data.cams:
 		print("Evaluating {}".format(cam))
 		for frame in data.get_data(cam, DataSource.ALL):
-			print(frame["metadata"]["scene_name"])
-			# print(idx)
-			if idx < 24222:
-				idx+=1
-				continue
 			rospy.wait_for_service('/posecnn_refined/posecnn_recognize_refined')
 			try:
 				req = rospy.ServiceProxy('/posecnn_refined/posecnn_recognize_refined', posecnn_recognize_refined)
@@ -65,12 +60,12 @@ def eval_result(data, detection, ground_truth, depth_img, depth_info):
 				gt_entry = [det for det in ground_truth if det["cls"] == obj_cls][0]
 				detection_entry = [det for det in detection if det["cls"] == obj_cls][0]
 				# check the pose errorrrrr
-				gt_2d_pos = [gt_entry["pose"]["position"][0], gt_entry["pose"]["position"][1]]
-				detection_2d_pos = [detection_entry["pose"]["position"][0], detection_entry["pose"]["position"][1]]
-				trans_error_2d = distance.euclidean(gt_2d_pos, detection_2d_pos)
+				# gt_2d_pos = [gt_entry["pose"]["position"][0], gt_entry["pose"]["position"][1]]
+				# detection_2d_pos = [detection_entry["pose"]["position"][0], detection_entry["pose"]["position"][1]]
+				# trans_error_2d = distance.euclidean(gt_2d_pos, detection_2d_pos)
 				trans_error, rot_error, vsd_error = get_errors(obj_cls, detection_entry["pose"], gt_entry["pose"], depth_img, depth_info)
 				# check range with tolerance: if object centers are within 5 cm, the recognition is considered correct
-				if trans_error_2d <= 0.05:
+				if trans_error <= 0.05:
 					correctness = "correct"
 					print("CORRECT DETECTION! With euclidean distance: {}, rot error: {} and vsd error: {}".format(trans_error_2d, rot_error, vsd_error))
 				else:
@@ -84,7 +79,7 @@ def eval_result(data, detection, ground_truth, depth_img, depth_info):
 		result[obj_cls+"_correctness"] = correctness # or "correct", "false_pos", "false_neg"
 		result[obj_cls+"_vsd_error"] = vsd_error
 		result[obj_cls+"_trans_error"] = trans_error
-		result[obj_cls+"_2d_trans_error"] = trans_error_2d
+		# result[obj_cls+"_2d_trans_error"] = trans_error_2d
 		result[obj_cls+"_rot_error"] = rot_error
 	return result
 
@@ -149,7 +144,7 @@ def save_detection(result, detection, ground_truth, metadata, idx, cam):
 
 
 
-	yaml_path = data_path + '/results_ALL_noICP/' + cam + '/'+ str(idx) +'.yaml'
+	yaml_path = data_path + '/results/' + cam + '/'+ str(idx) +'.yaml'
 	if not os.path.isfile(yaml_path):
 		try:
 			os.makedirs(os.path.dirname(yaml_path))
