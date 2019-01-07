@@ -48,16 +48,24 @@
   <!--   <test_depend>gtest</test_depend> -->
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>compare_cams</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>pose_cnn</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
   <build_depend>vision_msgs</build_depend>
-  <build_export_depend>compare_cams</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>vision_msgs</build_export_depend>
-  <exec_depend>compare_cams</exec_depend>
+  <exec_depend>pose_cnn </exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
