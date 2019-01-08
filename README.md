@@ -128,6 +128,13 @@ The generated frames have the following format:
     <img src="pics/figures/frame_structure.png" width="50%" />
 </p>
 
+Provided code for visualization
+===============================
+
+- edit paths to the datset in the launch/visualizer.launch launchfile
+- run `roslaunch ycb_multicam_dataset visualizer.launch`
+- run `rosrun rqt_reconfigure rqt_reconfigure`
+- edit scene and position in rqt_reconfigure
 
 Sample data
 ===========
