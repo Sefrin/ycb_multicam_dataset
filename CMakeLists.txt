@@ -10,6 +10,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   pose_cnn
   roscpp
+  roslaunch
   rospy
   vision_msgs
   tf2_ros
@@ -204,3 +205,7 @@ target_link_libraries(visualizer
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+if(CATKIN_ENABLE_TESTING)
+  roslaunch_add_file_check(launch)
+endif()
