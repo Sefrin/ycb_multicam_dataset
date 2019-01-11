@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-
 import os
 import rosbag
 import tf2_ros as tf2
 import rospy
 import yaml
 from tf2_geometry_msgs import PoseStamped
-from sensor_msgs.msg import *
 from vision_msgs.msg import Detection3DArray
-import numpy as np
 from enum import Enum
 
 class DataSource(Enum):

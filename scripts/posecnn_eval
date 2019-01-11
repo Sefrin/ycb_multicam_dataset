@@ -4,8 +4,7 @@ import os.path
 import yaml
 from yaml import CLoader as Loader, CDumper as Dumper
 import numpy as np
-from YCBMulticamDataset import YCBMulticamDataset as ycb
-from YCBMulticamDataset import DataSource
+from ycb_multicam_dataset import YCBMulticamDataset, DataSource
 from pose_cnn.srv import posecnn_recognize_refined
 from obj_pose_eval import pose_error, inout
 from scipy.spatial import distance
@@ -18,7 +17,7 @@ import errno
 
 def eval_posecnn():
 	rospy.sleep(10.)
-	data = ycb(data_path)
+	data = YCBMulticamDataset(data_path)
 	idx = 0
 
 	for cam in data.cams:
