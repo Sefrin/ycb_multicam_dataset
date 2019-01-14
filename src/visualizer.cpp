@@ -5,7 +5,7 @@
 #include <tf2_ros/buffer.h>
 #include <tf/transform_datatypes.h>
 #include <tf/tfMessage.h>
-#include <pose_cnn/database_loader.h>
+#include <ycb_multicam_dataset/model_loader.h>
 #include <dynamic_reconfigure/server.h>
 #include <ycb_multicam_dataset/visualizerConfig.h>
 #include <vision_msgs/Detection3DArray.h>
@@ -20,7 +20,7 @@ std::string dataset_path_, models_dir_, scene_, camera_ = "";
 int position_;
 tf2_ros::Buffer tf_buffer_;
 // vision_msgs::Detection3DArray ground_truth_;
-DatabaseLoader * db_loader_;
+ModelLoader * db_loader_;
 std::map<std::string, geometry_msgs::PoseStamped> ground_truth_;
 ros::Publisher gt_pub_;
 ros::Publisher cloud_pub_;
@@ -344,7 +344,7 @@ int main (int argc, char *argv[])
         ROS_ERROR("Declared folders are not valid. Please create them or check correct path.");
         return 0;
     }
-    DatabaseLoader db_loader(dataset_path_, models_dir_);
+    ModelLoader db_loader(dataset_path_, models_dir_);
     db_loader_ = &db_loader;
 
     dynamic_reconfigure::Server<ycb_multicam_dataset::visualizerConfig> server;
