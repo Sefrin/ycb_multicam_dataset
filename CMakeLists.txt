@@ -8,13 +8,19 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  vision_msgs
-  tf2_ros
-  pose_cnn
+  cv_bridge
   dynamic_reconfigure
+  message_generation
   pcl_ros
+  # pose_cnn -- only needed for the pose_cnn_eval script
+  rosbag
+  roscpp
+  roslaunch
+  rospy
+  sensor_msgs
+  tf2_geometry_msgs
+  tf2_ros
+  vision_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -24,7 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -109,7 +115,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
  INCLUDE_DIRS include
  # LIBRARIES database_loader
- CATKIN_DEPENDS message_runtime roscpp rospy sensor_msgs std_msgs pose_cnn
+ CATKIN_DEPENDS message_runtime pose_cnn roscpp rospy sensor_msgs tf2_geometry_msgs vision_msgs
 #  DEPENDS system_lib
 )
 
@@ -175,26 +181,27 @@ target_link_libraries(${PROJECT_NAME}_model_loader
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+catkin_install_python(PROGRAMS scripts/posecnn_eval
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+# Mark executables and/or libraries for installation
+install(TARGETS ${PROJECT_NAME}_visualizer
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+# Mark cpp header files for installation
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+)
+
+# Mark other files for installation (e.g. launch and bag files, etc.)
+install(FILES
+  launch/posecnn_eval.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
@@ -208,3 +215,7 @@ target_link_libraries(${PROJECT_NAME}_model_loader
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+if(CATKIN_ENABLE_TESTING)
+  roslaunch_add_file_check(launch)
+endif()

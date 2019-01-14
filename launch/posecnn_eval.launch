@@ -7,5 +7,5 @@
 
 	<node pkg="pose_cnn" type="posecnn_refined" name="posecnn_refined" args="$(arg home_path) $(arg models_dir)" output="screen" respawn="true"/>
 
-	<node pkg="ycb_multicam_dataset" type="posecnn_eval.py" name="posecnn_eval" output="screen"/>
+	<node pkg="ycb_multicam_dataset" type="posecnn_eval" name="posecnn_eval" output="screen"/>
 </launch>
