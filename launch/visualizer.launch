@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="home_path" default="$(env HOME)/storage/compare_data/" />
-	<arg name="models_dir" default="$(arg home_path)/YCB_models/" />
+	<arg name="home_path" default="$(env HOME)/sample_data/" />
+	<arg name="models_dir" default="$(env HOME)/storage/compare_data/YCB_models/" />
 
-	<node pkg="ycb_multicam_dataset" type="visualizer" name="visualizer" args="$(arg home_path) $(arg models_dir)" output="screen" respawn="true"/>
+	<node pkg="ycb_multicam_dataset" type="visualizer" name="visualizer" args="$(arg home_path) $(arg models_dir)" output="screen" />
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find ycb_multicam_dataset)/launch/rviz_config/visualizer.rviz" required="false"/>
 
 

@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslaunch
   rospy
   sensor_msgs
+  tf_conversions
   tf2_geometry_msgs
   tf2_ros
   vision_msgs
