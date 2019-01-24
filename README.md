@@ -94,6 +94,9 @@ The folder structure of the dataset:
     <img src="pics/figures/file_structure.png" width="50%" />
 </p>
 
+The snapshots are compressed with bz2 and can be decompressed with the ROSBag commandline tools like:
+`find . -type f -name "*.bag*" -exec rosbag decompress {} \;`
+
 Provided code for evaluation
 ============================
 
